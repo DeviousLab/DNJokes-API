@@ -427,7 +427,7 @@ def test_read_search_jokes():
 
 def test_read_search_jokes_bad_query():
     response = client.get("/joke/search?keyword=ben")
-    assert response.status_code == 200
+    assert response.status_code == 404
     assert response.json() == {"message": "No matches found for 'ben'"}
 
 
@@ -467,5 +467,5 @@ def test_read_id_jokes():
 
 def test_read_id_jokes_bad_id():
     response = client.get("/joke/49")
-    assert response.status_code == 200
+    assert response.status_code == 404
     assert response.json() == {"message": "No joke found with id 49"}

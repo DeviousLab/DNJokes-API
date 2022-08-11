@@ -2,7 +2,7 @@ import os
 import random
 import re
 from typing import Optional
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response, status
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -54,7 +54,7 @@ key = os.getenv("SUPABASE_SUPAFAST_KEY")
 supabase: Client = create_client(url, key)
 
 
-@app.get("/jokes", status_code=200, tags=["Get all jokes"])
+@app.get("/jokes", status_code=status.HTTP_200_OK, tags=["Get all jokes"])
 @limiter.limit("5/minute")
 def all_jokes(request: Request, max_results: Optional[int] = 47):
     jokes = supabase.table("Jokes").select("*").limit(max_results).execute()
@@ -62,9 +62,9 @@ def all_jokes(request: Request, max_results: Optional[int] = 47):
     return jokes
 
 
-@app.get("/joke/search", status_code=200, tags=["Get joke by query"])
+@app.get("/joke/search", status_code=status.HTTP_200_OK, tags=["Get joke by query"])
 @limiter.limit("5/minute")
-def search_jokes(request: Request, keyword: Optional[str] = None):
+def search_jokes(request: Request, response: Response, keyword: Optional[str] = None):
     if keyword is None:
         return supabase.table("Jokes").select("*").execute()
     else:
@@ -75,12 +75,13 @@ def search_jokes(request: Request, keyword: Optional[str] = None):
             if re.search(keyword, index["prompt"], re.IGNORECASE):
                 query_results.append(index)
         if query_results == []:
+            response.status_code = status.HTTP_404_NOT_FOUND
             return {"message": "No matches found for '{query}'".format(query=keyword)}
 
         return query_results
 
 
-@app.get("/joke/random", status_code=200, tags=["Get a random joke"])
+@app.get("/joke/random", status_code=status.HTTP_200_OK, tags=["Get a random joke"])
 @limiter.limit("5/minute")
 def random_joke(request: Request):
     random_int = random.randrange(1, 47)
@@ -89,11 +90,12 @@ def random_joke(request: Request):
     return joke
 
 
-@app.get("/joke/{id}", status_code=200, tags=["Get joke by id"])
+@app.get("/joke/{id}", status_code=status.HTTP_200_OK, tags=["Get joke by id"])
 @limiter.limit("5/minute")
-def id_joke(request: Request, id: int):
+def id_joke(request: Request, response: Response, id: int):
     joke = supabase.table("Jokes").select("*").eq("id", id).execute()
     if joke.data == []:
+        response.status_code = status.HTTP_404_NOT_FOUND
         return {"message": "No joke found with id {id}".format(id=id)}
 
     return joke
