@@ -76,7 +76,7 @@ def search_jokes(request: Request, keyword: Optional[str] = None):
                 query_results.append(index)
         if query_results == []:
             return {"message": "No matches found for '{query}'".format(query=keyword)}
-            
+
         return query_results
 
 
@@ -93,5 +93,7 @@ def random_joke(request: Request):
 @limiter.limit("5/minute")
 def id_joke(request: Request, id: int):
     joke = supabase.table("Jokes").select("*").eq("id", id).execute()
+    if joke.data == []:
+        return {"message": "No joke found with id {id}".format(id=id)}
 
     return joke
