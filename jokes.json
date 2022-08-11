@@ -372,4 +372,13 @@
     "first": "It was pretty expensive.",
     "second": "To buy deez nuts!"
   }
-}]
+},
+{
+  "id": 47,
+  "prompt": "Do you want to head out to get some boba?",
+  "reply": {
+    "first": "Yeah sure!",
+    "second": "Both of deez nuts!"
+  }
+}
+]
