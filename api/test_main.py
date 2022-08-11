@@ -360,6 +360,56 @@ def test_read_all_jokes():
     }
 
 
+def test_read_all_jokes_max_results():
+    response = client.get("/jokes?max_results=5")
+    assert response.status_code == 200
+    assert response.json() == {
+        "data": [
+            {
+                "id": 20,
+                "prompt": "How do you say 'Yes, I would like some' in Spanish?",
+                "reply": {
+                    "first": "Si..",
+                    "second": "(quickly interupt), see deez nuts!",
+                },
+            },
+            {
+                "id": 1,
+                "prompt": "How much did your trip to Dubai cost?",
+                "reply": {
+                    "first": "It was pretty expensive.",
+                    "second": "To buy deez nuts!",
+                },
+            },
+            {
+                "id": 2,
+                "prompt": "Excuse me but do you like Wendys?",
+                "reply": {
+                    "first": "Yes why?",
+                    "second": "Because you are going to love when deez nuts hit you in the face.",
+                },
+            },
+            {
+                "id": 3,
+                "prompt": "Excuse me but do you Bofa?",
+                "reply": {
+                    "first": "Bofa? I don't think so?",
+                    "second": "Bofa deez nuts!",
+                },
+            },
+            {
+                "id": 4,
+                "prompt": "Hey, are you familar with Landon?",
+                "reply": {
+                    "first": "Landon who?",
+                    "second": "Slip, fall then landon deez nuts.",
+                },
+            },
+        ],
+        "count": null,
+    }
+
+
 def test_read_search_jokes():
     response = client.get("/joke/search?keyword=tulip")
     assert response.status_code == 200
@@ -374,7 +424,14 @@ def test_read_search_jokes():
         }
     ]
 
-#TODO
+
+def test_read_search_jokes_bad_query():
+    response = client.get("/joke/search?keyword=ben")
+    assert response.status_code == 200
+    assert response.json() == {"message": "No matches found for 'ben'"}
+
+
+# TODO
 # def test_read_random_jokes():
 #     response = client.get("/joke/random")
 #     assert response.status_code == 200
@@ -406,3 +463,9 @@ def test_read_id_jokes():
         ],
         "count": null,
     }
+
+
+def test_read_id_jokes_bad_id():
+    response = client.get("/joke/49")
+    assert response.status_code == 200
+    assert response.json() == {"message": "No joke found with id 49"}
