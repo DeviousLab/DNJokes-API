@@ -36,22 +36,22 @@ def search_jokes(keyword: Optional[str] = None):
         for index in jokes.data:
                 if re.search(keyword, index['prompt'], re.IGNORECASE):
                         query_results.append(index)
-                # else:
-                #         return {
-                #             "message": "No matches found for '{query}'".format(query=keyword)
-                #         }
+        if query_results == []:
+                return {
+                    "message": "No matches found for '{query}'".format(query=keyword)
+                }
         return query_results
 
 @app.get("/joke/random", status_code=200) #done
 def random_joke():
     random_int = random.randrange(1, 47)
-    jokes = supabase.table('Jokes').select('*').eq('id', random_int).execute()
+    joke = supabase.table('Jokes').select('*').eq('id', random_int).execute()
 
-    return jokes
+    return joke
 
 @app.get("/joke/{id}", status_code=200) #done
 def id_joke(id: int):
-    jokes = supabase.table('Jokes').select('*').eq('id', id).execute()
+    joke = supabase.table('Jokes').select('*').eq('id', id).execute()
 
-    return jokes
+    return joke
 
