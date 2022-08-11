@@ -9,6 +9,25 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
+tags_metadata = [
+    {
+        "name": "Get all jokes",
+        "description": "Get an array of all jokes contained in the database. Ratelimited to 5 requests per minute.",
+    },
+    {
+        "name": "Get joke by query",
+        "description": "Get a joke by searching for a keyword in the prompt field. Ratelimited to 5 requests per minute.",
+    },
+    {
+        "name": "Get a random joke",
+        "description": "Get a random joke from the database. Ratelimited to 5 requests per minute.",
+    },
+    {
+        "name": "Get joke by id",
+        "description": "Get a joke from the database by its id. Ratelimited to 5 requests per minute.",
+    }
+]
+
 load_dotenv()
 app = FastAPI(
     title="Deez Nuts Jokes",
@@ -23,6 +42,7 @@ app = FastAPI(
         "name": "MIT",
         "url": "https://www.mit.edu/~amini/LICENSE.md",
     },
+    openapi_tags=tags_metadata,
     docs_url="/",
 )
 limiter = Limiter(key_func=get_remote_address)
@@ -34,14 +54,14 @@ key = os.getenv('SUPABASE_SUPAFAST_KEY')
 supabase: Client = create_client(url, key)
 
 
-@app.get("/jokes", status_code=200)
+@app.get("/jokes", status_code=200, tags=["Get all jokes"])
 @limiter.limit("5/minute")
 def all_jokes(request: Request, max_results: Optional[int] = 47):
     jokes = supabase.table('Jokes').select('*').limit(max_results).execute()
 
     return jokes
 
-@app.get("/joke/search", status_code=200)
+@app.get("/joke/search", status_code=200, tags=["Get joke by query"])
 @limiter.limit("5/minute")
 def search_jokes(request: Request, keyword: Optional[str] = None):
     if keyword is None:
@@ -59,7 +79,7 @@ def search_jokes(request: Request, keyword: Optional[str] = None):
                 }
         return query_results
 
-@app.get("/joke/random", status_code=200)
+@app.get("/joke/random", status_code=200, tags=["Get a random joke"])
 @limiter.limit("5/minute")
 def random_joke(request: Request):
     random_int = random.randrange(1, 47)
@@ -67,7 +87,7 @@ def random_joke(request: Request):
 
     return joke
 
-@app.get("/joke/{id}", status_code=200)
+@app.get("/joke/{id}", status_code=200, tags=["Get joke by id"])
 @limiter.limit("5/minute")
 def id_joke(request: Request, id: int):
     joke = supabase.table('Jokes').select('*').eq('id', id).execute()
