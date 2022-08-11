@@ -10,7 +10,21 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 load_dotenv()
-app = FastAPI()
+app = FastAPI(
+    title="Deez Nuts Jokes",
+    description="The Deez Nuts Jokes API allows users to access a collection of jokes about Deez Nuts to use in their applications. 🥜 The API is powered by Supabase and FastAPI.",
+    version="0.1.0",
+    contact={
+        "name": "DeviousLab",
+        "url": "http://deviouslab.dev/",
+        "email": "devious@deviouslab.dev",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://www.mit.edu/~amini/LICENSE.md",
+    },
+    docs_url="/",
+)
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -19,11 +33,6 @@ url = os.getenv('SUPABASE_SUPAFAST_URL')
 key = os.getenv('SUPABASE_SUPAFAST_KEY')
 supabase: Client = create_client(url, key)
 
-@app.get("/")
-def index():
-    return {
-        "message": "Please refer to the documentation for more or visit http://localhost:8000/docs"
-    }
 
 @app.get("/jokes", status_code=200)
 @limiter.limit("5/minute")
