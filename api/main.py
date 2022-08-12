@@ -2,7 +2,7 @@ import os
 import random
 import re
 from typing import Optional
-from fastapi import FastAPI, Request, Response, status
+from fastapi import FastAPI, Request, Response, status, Query
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from supabase import create_client, Client
@@ -66,18 +66,18 @@ async def validation_exception_handler(request, exc):
 
 @app.get("/jokes", status_code=status.HTTP_200_OK, tags=["Get all jokes"])
 @limiter.limit("5/minute")
-def all_jokes(request: Request, max_results: Optional[int] = 47):
-    jokes = supabase.table("Jokes").select("*").limit(max_results).execute()
-
+def all_jokes(request: Request, max_results: Optional[int] = 30):
+    jokes = supabase.table("Jokes").select("*").execute()
+    if max_results:
+        jokes = supabase.table("Jokes").select("*").limit(max_results).execute()
     return jokes
 
 
 @app.get("/joke/search", status_code=status.HTTP_200_OK, tags=["Get joke by query"])
 @limiter.limit("5/minute")
 def search_jokes(request: Request, response: Response, keyword: Optional[str] = None):
-    if keyword is None:
-        return supabase.table("Jokes").select("*").execute()
-    else:
+    jokes = supabase.table("Jokes").select("*").execute()
+    if keyword:
         query_results = []
         jokes = supabase.table("Jokes").select("*").execute()
 
@@ -87,8 +87,8 @@ def search_jokes(request: Request, response: Response, keyword: Optional[str] = 
         if query_results == []:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"message": "No matches found for '{query}'".format(query=keyword)}
-
         return query_results
+    return jokes
 
 
 @app.get("/joke/random", status_code=status.HTTP_200_OK, tags=["Get a random joke"])
@@ -108,5 +108,5 @@ def id_joke(request: Request, response: Response, id: int):
         if joke.data == []:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"message": "No joke found with id {id}".format(id=id)}
-            
+
     return joke
