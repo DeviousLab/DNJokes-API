@@ -3,6 +3,8 @@ import random
 import re
 from typing import Optional
 from fastapi import FastAPI, Request, Response, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -54,6 +56,14 @@ key = os.getenv("SUPABASE_SUPAFAST_KEY")
 supabase: Client = create_client(url, key)
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"message": "Validation error, value is not a valid integer."},
+    )
+
+
 @app.get("/jokes", status_code=status.HTTP_200_OK, tags=["Get all jokes"])
 @limiter.limit("5/minute")
 def all_jokes(request: Request, max_results: Optional[int] = 47):
@@ -93,9 +103,10 @@ def random_joke(request: Request):
 @app.get("/joke/{id}", status_code=status.HTTP_200_OK, tags=["Get joke by id"])
 @limiter.limit("5/minute")
 def id_joke(request: Request, response: Response, id: int):
-    joke = supabase.table("Jokes").select("*").eq("id", id).execute()
-    if joke.data == []:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"message": "No joke found with id {id}".format(id=id)}
-
+    if isinstance(id, int):
+        joke = supabase.table("Jokes").select("*").eq("id", id).execute()
+        if joke.data == []:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return {"message": "No joke found with id {id}".format(id=id)}
+            
     return joke
