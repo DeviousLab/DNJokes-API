@@ -2,7 +2,7 @@ import os
 import random
 import re
 from typing import Optional
-from fastapi import FastAPI, Request, Response, status, Query
+from fastapi import FastAPI, Request, Response, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from supabase import create_client, Client
@@ -60,7 +60,10 @@ supabase: Client = create_client(url, key)
 async def validation_exception_handler(request, exc):
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"message": "Validation error, value is not a valid integer."},
+        content={
+            "detail": "Validation error, value is not a valid integer.",
+            "body": exc.errors(),
+        },
     )
 
 
@@ -70,6 +73,7 @@ def all_jokes(request: Request, max_results: Optional[int] = 30):
     jokes = supabase.table("Jokes").select("*").execute()
     if max_results:
         jokes = supabase.table("Jokes").select("*").limit(max_results).execute()
+
     return jokes
 
 
@@ -85,9 +89,12 @@ def search_jokes(request: Request, response: Response, keyword: Optional[str] = 
             if re.search(keyword, index["prompt"], re.IGNORECASE):
                 query_results.append(index)
         if query_results == []:
-            response.status_code = status.HTTP_404_NOT_FOUND
-            return {"message": "No matches found for '{query}'".format(query=keyword)}
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No matches found for '{query}'".format(query=keyword),
+            )
         return query_results
+
     return jokes
 
 
@@ -106,7 +113,9 @@ def id_joke(request: Request, response: Response, id: int):
     if isinstance(id, int):
         joke = supabase.table("Jokes").select("*").eq("id", id).execute()
         if joke.data == []:
-            response.status_code = status.HTTP_404_NOT_FOUND
-            return {"message": "No joke found with id {id}".format(id=id)}
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No joke found with id {id}".format(id=id),
+            )
 
     return joke
