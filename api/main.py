@@ -14,19 +14,19 @@ from slowapi.errors import RateLimitExceeded
 tags_metadata = [
     {
         "name": "Get all jokes",
-        "description": "Get an array of all jokes contained in the database. Ratelimited to 5 requests per minute.",
+        "description": "Get an array of all jokes contained in the database. Rate limited to 5 requests per minute.",
     },
     {
         "name": "Get joke by search query",
-        "description": "Get a joke by searching for a keyword in the prompt field. Ratelimited to 5 requests per minute.",
+        "description": "Get a joke by searching for a keyword in the prompt field. Rate limited to 5 requests per minute.",
     },
     {
         "name": "Get a random joke",
-        "description": "Get a random joke from the database. Ratelimited to 10 requests per minute.",
+        "description": "Get a random joke from the database. Rate limited to 10 requests per minute.",
     },
     {
         "name": "Get joke by id",
-        "description": "Get a joke from the database by its id. Ratelimited to 10 requests per minute.",
+        "description": "Get a joke from the database by its id. Rate limited to 10 requests per minute.",
     },
 ]
 
@@ -89,7 +89,7 @@ def search_jokes(request: Request, response: Response, keyword: Optional[str] = 
         for index in jokes.data:
             if re.search(keyword, index["prompt"], re.IGNORECASE):
                 query_results.append(index)
-        if query_results == []:
+        if not query_results:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No matches found for '{query}'".format(query=keyword),
@@ -108,15 +108,14 @@ def random_joke(request: Request):
     return joke
 
 
-@app.get("/joke/{id}", status_code=status.HTTP_200_OK, tags=["Get joke by id"])
+@app.get("/joke/{dn_id}", status_code=status.HTTP_200_OK, tags=["Get joke by id"])
 @limiter.limit("10/minute")
-def id_joke(request: Request, response: Response, id: int):
-    if isinstance(id, int):
-        joke = supabase.table("Jokes").select("*").eq("id", id).execute()
-        if joke.data == []:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No joke found with id {id}".format(id=id),
-            )
+def id_joke(request: Request, response: Response, dn_id: int):
+    joke = supabase.table("Jokes").select("*").eq("id", dn_id).execute()
+    if not joke.data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No joke found with id {id}".format(id=dn_id),
+        )
 
     return joke
