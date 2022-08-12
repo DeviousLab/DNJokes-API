@@ -17,16 +17,16 @@ tags_metadata = [
         "description": "Get an array of all jokes contained in the database. Ratelimited to 5 requests per minute.",
     },
     {
-        "name": "Get joke by query",
+        "name": "Get joke by search query",
         "description": "Get a joke by searching for a keyword in the prompt field. Ratelimited to 5 requests per minute.",
     },
     {
         "name": "Get a random joke",
-        "description": "Get a random joke from the database. Ratelimited to 5 requests per minute.",
+        "description": "Get a random joke from the database. Ratelimited to 10 requests per minute.",
     },
     {
         "name": "Get joke by id",
-        "description": "Get a joke from the database by its id. Ratelimited to 5 requests per minute.",
+        "description": "Get a joke from the database by its id. Ratelimited to 10 requests per minute.",
     },
 ]
 
@@ -34,7 +34,7 @@ load_dotenv()
 app = FastAPI(
     title="Deez Nuts Jokes",
     description="The Deez Nuts Jokes API allows users to access a collection of jokes about Deez Nuts to use in their applications. 🥜 The API is powered by Supabase and FastAPI.",
-    version="0.1.0",
+    version="1.0.0",
     contact={
         "name": "DeviousLab",
         "url": "http://deviouslab.dev/",
@@ -45,6 +45,7 @@ app = FastAPI(
         "url": "https://www.mit.edu/~amini/LICENSE.md",
     },
     openapi_tags=tags_metadata,
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1},
     docs_url="/",
 )
 limiter = Limiter(key_func=get_remote_address)
@@ -77,7 +78,7 @@ def all_jokes(request: Request, max_results: Optional[int] = 30):
     return jokes
 
 
-@app.get("/joke/search", status_code=status.HTTP_200_OK, tags=["Get joke by query"])
+@app.get("/joke/search", status_code=status.HTTP_200_OK, tags=["Get joke by search query"])
 @limiter.limit("5/minute")
 def search_jokes(request: Request, response: Response, keyword: Optional[str] = None):
     jokes = supabase.table("Jokes").select("*").execute()
@@ -99,7 +100,7 @@ def search_jokes(request: Request, response: Response, keyword: Optional[str] = 
 
 
 @app.get("/joke/random", status_code=status.HTTP_200_OK, tags=["Get a random joke"])
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 def random_joke(request: Request):
     random_int = random.randrange(1, 47)
     joke = supabase.table("Jokes").select("*").eq("id", random_int).execute()
@@ -108,7 +109,7 @@ def random_joke(request: Request):
 
 
 @app.get("/joke/{id}", status_code=status.HTTP_200_OK, tags=["Get joke by id"])
-@limiter.limit("5/minute")
+@limiter.limit("10/minute")
 def id_joke(request: Request, response: Response, id: int):
     if isinstance(id, int):
         joke = supabase.table("Jokes").select("*").eq("id", id).execute()
