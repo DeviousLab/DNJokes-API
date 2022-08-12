@@ -70,7 +70,7 @@ async def validation_exception_handler(request, exc):
 
 @app.get("/jokes", status_code=status.HTTP_200_OK, tags=["Get all jokes"])
 @limiter.limit("5/minute")
-def all_jokes(request: Request, max_results: Optional[int] = 30):
+def all_jokes(request: Request, max_results: Optional[int] = 47):
     jokes = supabase.table("Jokes").select("*").execute()
     if max_results:
         jokes = supabase.table("Jokes").select("*").limit(max_results).execute()
