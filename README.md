@@ -26,9 +26,9 @@
 </p>
    
 <h4>
-    <a href="https://github.com/DeviousLab/DNJokes-API/issues/">Report Bug</a>
+    <a href="https://github.com/DeviousLab/DNJokes-API/issues/new?assignees=DeviousLab&labels=bug&template=bug_report.md&title=%5BBug%5D">Report Bug</a>
   <span> · </span>
-    <a href="https://github.com/DeviousLab/DNJokes-API/issues/">Request Feature</a>
+    <a href="https://github.com/DeviousLab/DNJokes-API/issues/new?assignees=DeviousLab&labels=enhancement&template=joke-suggestion.md&title=%5BSuggestion%5D+">Suggest a joke</a>
   </h4>
 </div>
 
@@ -129,8 +129,8 @@ Start the server
 <!-- Roadmap -->
 ## :compass: Roadmap
 
-* [ ] Add handler to suggest new jokes
-* [ ] Setup issue/PR templates
+* [ ] ~~Add handler to suggest new jokes~~
+* [X] Setup issue/PR templates
 * [ ] Develop NodeJS/Typescript wrapper for API
 
 <!-- Contributing -->
