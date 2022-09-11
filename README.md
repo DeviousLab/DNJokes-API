@@ -7,6 +7,9 @@
     The Deez Nuts Jokes API allows users to access a collection of jokes about Deez Nuts to use in their applications. 🥜 
     Also available on <a href="https://rapidapi.com/DeviousLab/api/deez-nuts-jokes">RapidAPI</a>.
   </p>
+  <p>
+    A wrapper built with TypeScript/JavaScript is also available on <a href="https://www.npmjs.com/package/dnjokes-api-wrapper">npm</a>.
+  </p>
 
   
 <!-- Badges -->
@@ -131,7 +134,7 @@ Start the server
 
 * [ ] ~~Add handler to suggest new jokes~~
 * [X] Setup issue/PR templates
-* [ ] Develop NodeJS/Typescript wrapper for API
+* [X] Develop NodeJS/Typescript wrapper for API
 
 <!-- Contributing -->
 ## :wave: Contributing
