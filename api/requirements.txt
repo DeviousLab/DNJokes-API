@@ -68,3 +68,4 @@ watchfiles==0.16.1
 webencodings==0.5.1
 websockets==10.0
 zipp==3.8.1
+wheel>=0.38.0 # not directly required, pinned by Snyk to avoid a vulnerability
