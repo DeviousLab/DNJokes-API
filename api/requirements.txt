@@ -43,7 +43,7 @@ python-semantic-release==7.28.1
 PyYAML==6.0
 readme-renderer==36.0
 realtime==0.0.4
-redis==3.5.3
+redis==4.3.6
 requests==2.31.0
 requests-toolbelt==0.9.1
 rfc3986==1.5.0
