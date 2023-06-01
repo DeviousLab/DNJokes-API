@@ -5,11 +5,12 @@ from typing import Optional
 from fastapi import FastAPI, Request, Response, status, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from supabase import create_client, Client
+from supabase.client import create_client, Client
 from dotenv import load_dotenv
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.extension import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from deta import Deta
 
 tags_metadata = [
     {
@@ -54,6 +55,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 url = os.getenv("SUPABASE_SUPAFAST_URL")
 key = os.getenv("SUPABASE_SUPAFAST_KEY")
+deta = Deta(url)
+deta = Deta(key)
 supabase: Client = create_client(url, key)
 
 
