@@ -33,7 +33,7 @@ postgrest-py==0.10.2
 py==1.11.0
 pycparser==2.21
 pydantic==1.9.2
-Pygments==2.12.0
+Pygments==2.15.0
 pyparsing==3.0.9
 pytest==7.1.2
 python-dateutil==2.8.2
